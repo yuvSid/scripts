@@ -1,8 +1,12 @@
 
 import json
-  
+import re
+
 # Opening JSON file
 f = open('/Users/yurasidorov/Repos/scripts/python/result.json')
+
+# Search regex pattern
+message_pattern = re.compile(r'Wordle.*?([X,\d])\/([\d])')
   
 # returns JSON object as 
 # a dictionary
@@ -24,17 +28,16 @@ for i in rawData['messages']:
         continue
 
     string = i['text_entities'][0]['text']
-    words = string.split()
+    res = message_pattern.match(string)
 
-    resultInStr = str(words[2] if len(words) > 2 else '')
-    if words[0] != "Wordle" or not (resultInStr[0].isdigit() or words[2][0] == 'X'):
+    if not res:
         continue
     
-    tries = int(words[2][0]) if words[2][0] != 'X' else 7
+    tries = int(res[1]) if res[1] != 'X' else 7
     data[user][3] = data[user][3] + 1
     data[user][4] = data[user][4] + tries
     
-    if words[2][0] != 'X':
+    if res[1] != 'X':
         data[user][0] = data[user][0] + 1
         data[user][1] = data[user][1] + tries
 
